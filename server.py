@@ -9,7 +9,7 @@ def index():
 
 @app.route('/ETL_Data')
 def ELT():
-    exec(open("./VTA_pipline2.py").read())
+    import VTA_pipline2
     return render_template('ETL_data.html')
 
 if __name__ == '__main__':
