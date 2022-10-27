@@ -487,7 +487,7 @@ flight_type = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\flight_type'
 
 
 dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation,
-           dim_agent, dim_calendar, dim_routes, dim_fare_code, dim_slot_time, flight_type]
+        dim_agent, dim_calendar, dim_routes, dim_fare_code, dim_slot_time, flight_type]
 frame_list = []
 
 for dir_x in dir_list:
@@ -607,7 +607,7 @@ market_pricing.reset_index(inplace=True)
 market_pricing['adjusted_price'] = market_pricing['price'] - market_pricing['bag'] * 160000
 market_pricing['VU_compare_unique_flight_code'] = market_pricing['VU_compare'] + '_' + market_pricing['departure_date'].dt.strftime('%Y%m%d')
 market_pricing = market_pricing[['VU_compare_unique_flight_code', 'name', 'bag', 'meal',
-                                 'adjusted_price', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']]
+                                'adjusted_price', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']]
 market_pricing.drop_duplicates(inplace=True)
 market_pricing['type'] = 'normal'
 
@@ -699,7 +699,7 @@ market_pricing.reset_index(inplace=True)
 market_pricing['adjusted_price'] = market_pricing['price'] - market_pricing['bag'] * 160000
 market_pricing['VU_compare_unique_flight_code'] = market_pricing['VU_compare'] + '_' + market_pricing['departure_date'].dt.strftime('%Y%m%d')
 market_pricing = market_pricing[['VU_compare_unique_flight_code', 'name', 'bag', 'meal',
-                                 'adjusted_price', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']]
+                                'adjusted_price', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']]
 market_pricing.drop_duplicates(inplace=True)
 market_pricing['type'] = 'normal'
 
