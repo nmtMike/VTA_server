@@ -593,9 +593,7 @@ def load_target_cost():
     log_list.append(['target_cost', 'new rows updated', pd.Timestamp.now()])
 
 
-
-
-
+# declare which dir to load
 cargo = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\cargo'
 flown_aircraft_leg = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\flown_aircraft_leg'
 inflow_cash = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\inflow_cash'
@@ -654,6 +652,7 @@ load_dim_slot_time()
 load_flight_type()
 load_target_cost()
 load_fee_type()
+load_exchange_rate()
 
 
 # write new log_table
@@ -751,6 +750,8 @@ log_list.append(['total_market_price', f'new rows updated - {total_market_price.
 
 
 
+
+
 # ____________________________________pricing for Lunar Newyear
 # collect all file in folder 'pricing'
 pricing_folder = file_name_modified(r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\pricing_special_days\Lunar_newyear')['dir_file']
@@ -837,8 +838,8 @@ market_pricing['type'] = 'normal'
 market_pricing.to_sql('market_pricing', conn, if_exists='append', index=False)
 total_market_price.to_sql('total_market_price', conn, if_exists='append', index=False)
 log_list.append(['total_market_price', f'new rows updated - {total_market_price.shape}', pd.Timestamp.now()])
-# print(f'replicate pricing Lunar Newyear {total_market_price.shape} : done')
 
-pd.DataFrame(log_list, columns=['table_name', 'action', 'updated_time']).to_excel('log_file.xlsx', index=False)
 
-# print('ETL---------------------------------> Done')
+log_dir = 'D:\\NMT\\OneDrive\\Viettravel Airline\\Database\\fact\\log_history'
+log_time = datetime.datetime.now().strftime('%Y%m%d.%H%M%S')
+pd.DataFrame(log_list, columns=['table_name', 'action', 'updated_time']).to_excel(f'{log_dir}\\log_file_{log_time}.xlsx', index=False)
