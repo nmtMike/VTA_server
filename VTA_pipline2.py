@@ -751,9 +751,6 @@ log_list.append(['total_market_price', f'new rows updated - {total_market_price.
 
 
 
-
-
-
 # ____________________________________pricing for Lunar Newyear
 # collect all file in folder 'pricing'
 pricing_folder = file_name_modified(r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\pricing_special_days\Lunar_newyear')['dir_file']
