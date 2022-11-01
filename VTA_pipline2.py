@@ -1,6 +1,7 @@
 # import necessary materials
 import sqlite3
 import pandas as pd
+from pandas.tseries.offsets import MonthEnd
 import glob
 import os
 from tqdm import tqdm
@@ -498,7 +499,42 @@ def load_fee_type():
     else:
         log_list.append(['fee_type', 'no new rows added', pd.Timestamp.now()])
         apply_delete_row(remove_table[remove_table['table_name'] == 'fee_type'])
-        
+
+
+
+# ---------------------------------------------------------------------------------  
+def load_exchange_rate():
+    exchange_rate_files_dir = add_table[add_table['table_name'] == 'exchange_rate'].reset_index(drop=True)['dir_file']
+    exchange_rate_files_mod_time = add_table[add_table['table_name'] == 'exchange_rate'].reset_index(drop=True)['modified_time']
+    exchange_rate_files_name = add_table[add_table['table_name'] == 'exchange_rate'].reset_index(drop=True)['file_name']
+
+    if len(exchange_rate_files_dir) != 0:
+        # read files into a dataframe
+        li = []
+        for i in tqdm(range(len(exchange_rate_files_dir)), desc='load exchange_rate files'):
+            df = pd.read_excel(exchange_rate_files_dir[i], index_col=None, header=0)
+            df['file_name'] = exchange_rate_files_name[i]
+            df['modified_time'] = exchange_rate_files_mod_time[i]
+            li.append(df)
+        add_exchange_rate = pd.concat(li, axis=0, ignore_index=True)
+
+        # transform
+        date_index = pd.date_range(start=add_exchange_rate['Valid_date'].min(), end=add_exchange_rate['Valid_date'].max() + MonthEnd(0))
+        curr_code = add_exchange_rate['Code'].unique()
+        new_index = pd.MultiIndex.from_product([date_index, curr_code], names=['Valid_date', 'Code'])
+        add_exchange_rate_new = add_exchange_rate.set_index(['Valid_date', 'Code'])
+        add_exchange_rate = add_exchange_rate_new.reindex(new_index).reset_index().sort_values(by=['Code', 'Valid_date']).fillna(method='ffill').reset_index(drop=True)
+
+        apply_delete_row(remove_table[remove_table['table_name'] == 'exchange_rate'])
+        try: 
+            add_exchange_rate.to_sql('exchange_rate', conn, if_exists='append', index=False)
+            log_list.append(['exchange_rate', 'new rows loaded', pd.Timestamp.now()])
+        except: log_list.append(['exchange_rate', 'cannot load new rows', pd.Timestamp.now()])
+
+    else:
+        log_list.append(['exchange_rate', 'no new rows added', pd.Timestamp.now()])
+        apply_delete_row(remove_table[remove_table['table_name'] == 'exchange_rate'])
+
 
 # ---------------------------------------------------------------------------------         
         
@@ -575,10 +611,11 @@ dim_routes = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_routes'
 dim_slot_time = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_slot_time'
 flight_type = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\flight_type'
 fee_type = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\fee_type'
+exchange_rate = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\exchange_rate'
 
 
 dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation, pax_transaction,
-        dim_agent, dim_calendar, dim_routes, dim_fare_code, dim_slot_time, flight_type, fee_type]
+        dim_agent, dim_calendar, dim_routes, dim_fare_code, dim_slot_time, flight_type, fee_type, exchange_rate]
 frame_list = []
 
 for dir_x in dir_list:
