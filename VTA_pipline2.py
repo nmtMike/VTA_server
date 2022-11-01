@@ -271,7 +271,7 @@ def load_reservation():
         log_list.append(['reservation', 'no new rows added', pd.Timestamp.now()])
         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation'])
 
-
+# ---------------------------------------------------------------------------------  
 def load_pax_transaction():
     pax_transaction_files_dir = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['dir_file']
     pax_transaction_files_mod_time = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['modified_time']
@@ -302,7 +302,11 @@ def load_pax_transaction():
         log_list.append(['pax_transaction', 'no new rows added', pd.Timestamp.now()])
         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
 
-                
+
+
+# ---------------------------------------------------------------------------------  
+# ---------------------------------------------------------------------------------  
+# ---------------------------------------------------------------------------------  
 # _______________ dim tables_______________
 
 def load_dim_agent():
@@ -324,7 +328,7 @@ def load_dim_agent():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_agent'])
         try: 
-            add_dim_agent.to_sql('dim_agent', conn, if_exists='append', index=False)
+            add_dim_agent.to_sql('dim_agent', conn, if_exists='replace', index=False)
             log_list.append(['dim_agent', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_agent', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -352,7 +356,7 @@ def load_dim_calendar():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_calendar'])
         try: 
-            add_dim_calendar.to_sql('dim_calendar', conn, if_exists='append', index=False)
+            add_dim_calendar.to_sql('dim_calendar', conn, if_exists='replace', index=False)
             log_list.append(['dim_calendar', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_calendar', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -380,7 +384,7 @@ def load_dim_fare_code():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_fare_code'])
         try: 
-            add_dim_fare_code.to_sql('dim_fare_code', conn, if_exists='append', index=False)
+            add_dim_fare_code.to_sql('dim_fare_code', conn, if_exists='replace', index=False)
             log_list.append(['dim_fare_code', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_fare_code', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -408,7 +412,7 @@ def load_dim_routes():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_routes'])
         try: 
-            add_dim_routes.to_sql('dim_routes', conn, if_exists='append', index=False)
+            add_dim_routes.to_sql('dim_routes', conn, if_exists='replace', index=False)
             log_list.append(['dim_routes', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_routes', 'cannot load new rows', pd.Timestamp.now()])
         
@@ -464,7 +468,7 @@ def load_flight_type():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'flight_type'])
         try: 
-            add_flight_type.to_sql('flight_type', conn, if_exists='append', index=False)
+            add_flight_type.to_sql('flight_type', conn, if_exists='replace', index=False)
             log_list.append(['flight_type', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['flight_type', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -492,7 +496,7 @@ def load_fee_type():
         #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'fee_type'])
         try: 
-            add_fee_type.to_sql('fee_type', conn, if_exists='append', index=False)
+            add_fee_type.to_sql('fee_type', conn, if_exists='replace', index=False)
             log_list.append(['fee_type', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['fee_type', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -527,7 +531,7 @@ def load_exchange_rate():
 
         apply_delete_row(remove_table[remove_table['table_name'] == 'exchange_rate'])
         try: 
-            add_exchange_rate.to_sql('exchange_rate', conn, if_exists='append', index=False)
+            add_exchange_rate.to_sql('exchange_rate', conn, if_exists='replace', index=False)
             log_list.append(['exchange_rate', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['exchange_rate', 'cannot load new rows', pd.Timestamp.now()])
 
