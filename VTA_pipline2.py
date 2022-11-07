@@ -10,7 +10,7 @@ from datetime import timedelta
 pd.options.mode.chained_assignment = None
 
 # create connection to sqlite
-conn = sqlite3.connect(r"D:\NMT\OneDrive\Viettravel Airline\Database\VTA_RM.db")
+conn = sqlite3.connect(r"D:\NMT\OneDrive\Viettravel Airline\Database\VTA_RM_test.db")
 c = conn.cursor()
 warining_msg = '*****WARNING***** cannot add new rows to SQLite'
 
@@ -598,22 +598,22 @@ def load_target_cost():
 
 
 # declare which dir to load
-cargo = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\cargo'
-flown_aircraft_leg = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\flown_aircraft_leg'
-inflow_cash = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\inflow_cash'
-pax_revenue = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\pax_revenue'
-payment_detail = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\payment_detail'
-reservation = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\reservation'
-pax_transaction = r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\pax_transaction'
+cargo = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\cargo'
+flown_aircraft_leg = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\flown_aircraft_leg'
+inflow_cash = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\inflow_cash'
+pax_revenue = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pax_revenue'
+payment_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\payment_detail'
+reservation = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation'
+pax_transaction = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pax_transaction'
 
-dim_agent = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_agent'
-dim_calendar = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_calendar'
-dim_fare_code = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_fare_code'
-dim_routes = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_routes'
-dim_slot_time = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_slot_time'
-flight_type = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\flight_type'
-fee_type = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\fee_type'
-exchange_rate = r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\exchange_rate'
+dim_agent = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_agent'
+dim_calendar = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_calendar'
+dim_fare_code = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_fare_code'
+dim_routes = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_routes'
+dim_slot_time = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_slot_time'
+flight_type = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\flight_type'
+fee_type = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\fee_type'
+exchange_rate = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\exchange_rate'
 
 
 dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation, pax_transaction,
