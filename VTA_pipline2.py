@@ -290,6 +290,8 @@ def load_pax_transaction():
         #     transfrom
         add_pax_transaction['DEPARTURE_DATE'] = pd.to_datetime(add_pax_transaction['DEPARTURE_DATE'])
         add_pax_transaction['BOOK_DATE'] = pd.to_datetime(add_pax_transaction['BOOK_DATE'])
+        add_pax_transaction['IATA_NUM'] = add_pax_transaction['IATA_NUM'].fillna(add_pax_transaction['BOOKING_AGENT']).astype(str).str.replace('.0', '', regex=False)
+        # add_pax_transaction['IATA_NUM'].fillna(add_pax_transaction['BOOKING_AGENT'], inplace=True)
 
         #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
@@ -544,7 +546,7 @@ def load_exchange_rate():
         
 def load_target_cost():
     # load the raw target
-    targets_tmp = pd.read_excel(r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\target_cost\Targets.xlsx',
+    targets_tmp = pd.read_excel(r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\target_cost\Targets.xlsx',
                                  index_col=None, header=0)
 
     # transform routes into sector
@@ -568,7 +570,7 @@ def load_target_cost():
 
 
     # load the 'costs' file
-    costs_1 = pd.read_excel(r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\target_cost\Costs.xlsx',
+    costs_1 = pd.read_excel(r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\target_cost\Costs.xlsx',
                                  index_col=None, header=0)
     costs_2 = costs_1.copy()
     costs_2['Sector'] = costs_2['Sector'].str[3:] + costs_2['Sector'].str[:3]
@@ -666,7 +668,7 @@ print('write new log_table: done')
 
 # ____________________________________pricing for normal days
 # collect all file in folder 'pricing'
-pricing_folder = file_name_modified(r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\pricing')['dir_file']
+pricing_folder = file_name_modified(r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pricing')['dir_file']
 li = []
 for folder in pricing_folder:
     li.append(file_name_modified(folder))
@@ -719,7 +721,7 @@ column_order = ['name', 'VU','bag', 'meal', 'price', 'sector', 'departure_date',
 market_price = market_price[column_order].reset_index(drop=True)
 
 #     load the diff time of VU flights
-dim_pricing = pd.read_excel(r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_pricing\dim_pricing.xlsx')
+dim_pricing = pd.read_excel(r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_pricing\dim_pricing.xlsx')
 
 pricing_reference = market_price.set_index('name').join(dim_pricing.set_index('flight_num')).reset_index()
 pricing_reference.rename(columns={'index':'flight_num'}, inplace=True)
@@ -758,7 +760,7 @@ log_list.append(['total_market_price', f'new rows updated - {total_market_price.
 
 # ____________________________________pricing for Lunar Newyear
 # collect all file in folder 'pricing'
-pricing_folder = file_name_modified(r'D:\NMT\OneDrive\Viettravel Airline\Database\fact\pricing_special_days\Lunar_newyear')['dir_file']
+pricing_folder = file_name_modified(r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pricing_special_days\Lunar_newyear')['dir_file']
 li = []
 for folder in pricing_folder:
     li.append(file_name_modified(folder))
@@ -811,7 +813,7 @@ column_order = ['name', 'VU','bag', 'meal', 'price', 'sector', 'departure_date',
 market_price = market_price[column_order].reset_index(drop=True)
 
 #     load the diff time of VU flights
-dim_pricing = pd.read_excel(r'D:\NMT\OneDrive\Viettravel Airline\Database\dim\dim_pricing\dim_pricing.xlsx')
+dim_pricing = pd.read_excel(r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_pricing\dim_pricing.xlsx')
 
 pricing_reference = market_price.set_index('name').join(dim_pricing.set_index('flight_num')).reset_index()
 pricing_reference.rename(columns={'index':'flight_num'}, inplace=True)
@@ -844,6 +846,6 @@ total_market_price.to_sql('total_market_price', conn, if_exists='append', index=
 log_list.append(['total_market_price', f'new rows updated - {total_market_price.shape}', pd.Timestamp.now()])
 
 
-log_dir = 'D:\\NMT\\OneDrive\\Viettravel Airline\\Database\\fact\\log_history'
+log_dir = 'C:\\Users\\VTA-HAN\\NMT\\OneDrive\\Viettravel Airline\\Database\\fact\\log_history'
 log_time = datetime.datetime.now().strftime('%Y%m%d.%H%M%S')
 pd.DataFrame(log_list, columns=['table_name', 'action', 'updated_time']).to_excel(f'{log_dir}\\log_file_{log_time}.xlsx', index=False)
