@@ -10,7 +10,7 @@ from datetime import timedelta
 pd.options.mode.chained_assignment = None
 
 # create connection to sqlite
-conn = sqlite3.connect(r"C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\VTA_RM.db")
+conn = sqlite3.connect(r"C:\Users\VTA-HAN\Desktop\VTA\VTA_RM.db")
 c = conn.cursor()
 warining_msg = '*****WARNING***** cannot add new rows to SQLite'
 
