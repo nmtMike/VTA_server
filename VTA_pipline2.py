@@ -10,7 +10,7 @@ from datetime import timedelta
 pd.options.mode.chained_assignment = None
 
 # create connection to sqlite
-conn = sqlite3.connect(r"C:\Users\VTA-HAN\Desktop\VTA\VTA_RM.db")
+conn = sqlite3.connect(r"C:\Users\VTA-HAN\Desktop\VTA\VTA_RM_test.db")
 c = conn.cursor()
 warining_msg = '*****WARNING***** cannot add new rows to SQLite'
 
@@ -259,6 +259,8 @@ def load_reservation():
         add_reservation.columns = ['last_name', 'first_name', 'confirm', 'book_date', 'departure_date', 
                               'flight_number', 'class_code', 'ori_station', 'des_station', 'status', 'iata',
                               'copr_id', 'record_locator', 'eticket_num', 'file_name', 'modified_time']
+        add_reservation['ori_station'] = add_reservation['ori_station'].str.strip()
+        add_reservation['des_station'] = add_reservation['des_station'].str.strip()
 
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation'])
@@ -304,6 +306,43 @@ def load_pax_transaction():
         log_list.append(['pax_transaction', 'no new rows added', pd.Timestamp.now()])
         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
 
+
+# ---------------------------------------------------------------------------------  
+def load_reservation_charge_detail():
+    reservation_charge_detail_files_dir = add_table[add_table['table_name'] == 'reservation_charge_detail'].reset_index(drop=True)['dir_file']
+    reservation_charge_detail_files_mod_time = add_table[add_table['table_name'] == 'reservation_charge_detail'].reset_index(drop=True)['modified_time']
+    reservation_charge_detail_files_name = add_table[add_table['table_name'] == 'reservation_charge_detail'].reset_index(drop=True)['file_name']
+
+    if len(reservation_charge_detail_files_dir) != 0:
+    #     read files into a dataframe
+        li = []
+        for i in tqdm(range(len(reservation_charge_detail_files_dir)), desc='load reservation_charge_detail'):
+            df = pd.read_csv(reservation_charge_detail_files_dir[i], index_col=None, header=0)
+            df['file_name'] = reservation_charge_detail_files_name[i]
+            df['modified_time'] = reservation_charge_detail_files_mod_time[i]
+            li.append(df)
+        add_reservation_charge_detail = pd.concat(li, axis=0, ignore_index=True)
+
+        # transform
+        add_reservation_charge_detail['convert_timezone'] = pd.to_datetime(add_reservation_charge_detail['convert_timezone'])
+        add_reservation_charge_detail['convert_timezone.1'] = pd.to_datetime(add_reservation_charge_detail['convert_timezone.1'])
+        add_reservation_charge_detail['departure_date'] = pd.to_datetime(add_reservation_charge_detail['departure_date'])
+        add_reservation_charge_detail['convert_timezone.2'] = pd.to_datetime(add_reservation_charge_detail['convert_timezone.2'])
+        add_reservation_charge_detail['res_seg_cancel_date'] = pd.to_datetime(add_reservation_charge_detail['res_seg_cancel_date'])
+        add_reservation_charge_detail['res_seg_book_date'] = pd.to_datetime(add_reservation_charge_detail['res_seg_book_date'])
+        add_reservation_charge_detail['iata_num'] = add_reservation_charge_detail['iata_num'].\
+            fillna(add_reservation_charge_detail['booking_agent']).astype(str).str.replace('.0', '', regex=False)
+
+        # load to sqlite
+        apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_charge_detail'])
+        try: 
+            add_reservation_charge_detail.to_sql('reservation_charge_detail', conn, if_exists='append', index=False)
+            log_list.append(['reservation_charge_detail', 'new rows loaded', pd.Timestamp.now()])
+        except: log_list.append(['reservation_charge_detail', 'cannot load new rows', pd.Timestamp.now()])
+
+    else:
+        log_list.append(['reservation_charge_detail', 'no new rows added', pd.Timestamp.now()])
+        apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_charge_detail'])
 
 
 # ---------------------------------------------------------------------------------  
@@ -607,6 +646,7 @@ pax_revenue = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\p
 payment_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\payment_detail'
 reservation = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation'
 pax_transaction = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pax_transaction'
+reservation_charge_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation_charge_detail'
 
 dim_agent = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_agent'
 dim_calendar = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_calendar'
@@ -618,7 +658,7 @@ fee_type = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\fee_t
 exchange_rate = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\exchange_rate'
 
 
-dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation, pax_transaction,
+dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation, pax_transaction, reservation_charge_detail,
         dim_agent, dim_calendar, dim_routes, dim_fare_code, dim_slot_time, flight_type, fee_type, exchange_rate]
 frame_list = []
 
@@ -649,6 +689,7 @@ load_cargo()
 load_flown_aircraft_leg()
 load_reservation()
 load_pax_transaction()
+load_reservation_charge_detail()
 
 load_dim_agent()
 load_dim_calendar()
