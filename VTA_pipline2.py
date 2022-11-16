@@ -10,7 +10,7 @@ from datetime import timedelta
 pd.options.mode.chained_assignment = None
 
 # create connection to sqlite
-conn = sqlite3.connect(r"C:\Users\VTA-HAN\Desktop\VTA\VTA_RM_test.db")
+conn = sqlite3.connect(r"C:\Users\VTA-HAN\Desktop\VTA\VTA_RM.db")
 c = conn.cursor()
 warining_msg = '*****WARNING***** cannot add new rows to SQLite'
 
@@ -317,7 +317,7 @@ def load_reservation_charge_detail():
     #     read files into a dataframe
         li = []
         for i in tqdm(range(len(reservation_charge_detail_files_dir)), desc='load reservation_charge_detail'):
-            df = pd.read_csv(reservation_charge_detail_files_dir[i], index_col=None, header=0)
+            df = pd.read_csv(reservation_charge_detail_files_dir[i], index_col=None, header=0, dtype={'iata_num':str})
             df['file_name'] = reservation_charge_detail_files_name[i]
             df['modified_time'] = reservation_charge_detail_files_mod_time[i]
             li.append(df)
@@ -746,7 +746,8 @@ def read_pricing_files(row):
 pricing.apply(read_pricing_files, axis=1)
 market_price = pd.concat(li, ignore_index=True)
 
-market_price['price'] = market_price['price'].str.replace(',', '')
+market_price['price'] = market_price['price'].astype(str)
+market_price['price'] = market_price['price'].str.replace(',', '', regex=False)
 market_price = market_price.astype({'price':'int64'})
 market_price['departure_datetime'] = pd.to_datetime(market_price['departure_date'] + ' ' + market_price['time'].str[:5])
 market_price['VU'] = (market_price['name'].str[:2] == 'VU')*1
