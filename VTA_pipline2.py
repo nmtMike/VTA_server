@@ -38,6 +38,13 @@ def apply_delete_row(table:pd.DataFrame):
         # print('|_________ rows deleted')
     return None
     
+# update log_table function----------------------------------------------------------------
+def update_table(ori_table:pd.DataFrame, to_add:pd.DataFrame, to_remove:pd.DataFrame):
+    """once rows are deleted and new rows loaded, use this function to update log_table \n
+    This is use for update the remove table and log_table
+    """
+    pass
+
 # _______________ fact tables _______________
 
 def file_name_modified(path:str):
