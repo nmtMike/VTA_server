@@ -754,8 +754,13 @@ pricing.apply(read_pricing_files, axis=1)
 market_price = pd.concat(li, ignore_index=True)
 
 market_price['price'] = market_price['price'].astype(str)
+try:
+    filter_exception = market_price['price'].str.contains('đ', regex=False)
+    market_price.loc[filter_exception, 'price'] = market_price[filter_exception]['price'].str.split(r'\n', regex=True, expand=True)[1]
+except: pass
+
 market_price['price'] = market_price['price'].str.replace(',', '', regex=False)
-market_price = market_price.astype({'price':'int64'})
+market_price = market_price.astype({'price':'float'})
 market_price['departure_datetime'] = pd.to_datetime(market_price['departure_date'] + ' ' + market_price['time'].str[:5])
 market_price['VU'] = (market_price['name'].str[:2] == 'VU')*1
 market_price['departure_date'] = pd.to_datetime(market_price['departure_date'])
