@@ -339,6 +339,7 @@ def load_reservation_charge_detail():
         add_reservation_charge_detail['res_seg_book_date'] = pd.to_datetime(add_reservation_charge_detail['res_seg_book_date'])
         add_reservation_charge_detail['iata_num'] = add_reservation_charge_detail['iata_num'].\
             fillna(add_reservation_charge_detail['booking_agent']).astype(str).str.replace('.0', '', regex=False)
+        add_reservation_charge_detail['tax_code'].fillna('', inplace=True)
 
         # load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_charge_detail'])
