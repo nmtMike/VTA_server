@@ -13,6 +13,7 @@ pd.options.mode.chained_assignment = None
 conn = sqlite3.connect(r"C:\Users\VTA-HAN\Desktop\VTA\VTA_RM.db")
 c = conn.cursor()
 warining_msg = '*****WARNING***** cannot add new rows to SQLite'
+BG = 160000
 
 log_list = []
 
@@ -697,7 +698,7 @@ load_cargo()
 load_flown_aircraft_leg()
 load_reservation()
 load_pax_transaction()
-load_reservation_charge_detail()
+# load_reservation_charge_detail()
 
 load_dim_agent()
 load_dim_calendar()
@@ -767,7 +768,7 @@ market_price['VU'] = (market_price['name'].str[:2] == 'VU')*1
 market_price['departure_date'] = pd.to_datetime(market_price['departure_date'])
 
 total_market_price = market_price.copy()
-total_market_price['adjusted_price'] = total_market_price['price'] - total_market_price['bag'] * 160000
+total_market_price['adjusted_price'] = total_market_price['price'] - total_market_price['bag'] * BG
 column_order = ['name','bag', 'meal', 'adjusted_price', 'sector', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']
 total_market_price = total_market_price[column_order].reset_index(drop=True)
 total_market_price['type'] = 'normal'
@@ -796,7 +797,7 @@ market_pricing = c[(c['departure_datetime'] >= c['min_time']) & (c['departure_da
 market_pricing.reset_index(inplace=True)
 # market_pricing['flight_num'] = market_pricing['name'].str[2:]
 # market_pricing['airlines'] = market_pricing['name'].str[:2]
-market_pricing['adjusted_price'] = market_pricing['price'] - market_pricing['bag'] * 160000
+market_pricing['adjusted_price'] = market_pricing['price'] - market_pricing['bag'] * BG
 market_pricing['VU_compare_unique_flight_code'] = market_pricing['VU_compare'] + '_' + market_pricing['departure_date'].dt.strftime('%Y%m%d')
 market_pricing = market_pricing[['VU_compare_unique_flight_code', 'name', 'bag', 'meal',
                                 'adjusted_price', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']]
@@ -859,7 +860,7 @@ market_price['VU'] = (market_price['name'].str[:2] == 'VU')*1
 market_price['departure_date'] = pd.to_datetime(market_price['departure_date'])
 
 total_market_price = market_price.copy()
-total_market_price['adjusted_price'] = total_market_price['price'] - total_market_price['bag'] * 160000
+total_market_price['adjusted_price'] = total_market_price['price'] - total_market_price['bag'] * BG
 column_order = ['name','bag', 'meal', 'adjusted_price', 'sector', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']
 total_market_price = total_market_price[column_order].reset_index(drop=True)
 total_market_price['type'] = 'Lunar Newyear'
@@ -888,7 +889,7 @@ market_pricing = c[(c['departure_datetime'] >= c['min_time']) & (c['departure_da
 market_pricing.reset_index(inplace=True)
 # market_pricing['flight_num'] = market_pricing['name'].str[2:]
 # market_pricing['airlines'] = market_pricing['name'].str[:2]
-market_pricing['adjusted_price'] = market_pricing['price'] - market_pricing['bag'] * 160000
+market_pricing['adjusted_price'] = market_pricing['price'] - market_pricing['bag'] * BG
 market_pricing['VU_compare_unique_flight_code'] = market_pricing['VU_compare'] + '_' + market_pricing['departure_date'].dt.strftime('%Y%m%d')
 market_pricing = market_pricing[['VU_compare_unique_flight_code', 'name', 'bag', 'meal',
                                 'adjusted_price', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']]
