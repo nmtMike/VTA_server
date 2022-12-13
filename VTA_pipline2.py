@@ -261,7 +261,7 @@ def load_reservation():
         add_reservation = pd.concat(li, axis=0, ignore_index=True)
 
     #     transform
-        add_reservation = add_reservation[~(add_reservation['Status'] == 'Canceled')]
+        # add_reservation = add_reservation[~(add_reservation['Status'] == 'Canceled')]
         add_reservation['Book Date'] = pd.to_datetime(add_reservation['Book Date'])
         add_reservation['Departure Date'] = pd.to_datetime(add_reservation['Departure Date'])
         add_reservation.columns = ['last_name', 'first_name', 'confirm', 'book_date', 'departure_date', 
