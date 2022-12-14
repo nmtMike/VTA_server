@@ -354,6 +354,39 @@ def load_reservation_charge_detail():
         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_charge_detail'])
 
 
+
+# ---------------------------------------------------------------------------------  
+def load_reservation_segment_detail():
+    reservation_segment_detail_files_dir = add_table[add_table['table_name'] == 'reservation_segment_detail'].reset_index(drop=True)['dir_file']
+    reservation_segment_detail_files_mod_time = add_table[add_table['table_name'] == 'reservation_segment_detail'].reset_index(drop=True)['modified_time']
+    reservation_segment_detail_files_name = add_table[add_table['table_name'] == 'reservation_segment_detail'].reset_index(drop=True)['file_name']
+
+    if len(reservation_segment_detail_files_dir) != 0:
+    #     read files into a dataframe
+        li = []
+        for i in tqdm(range(len(reservation_segment_detail_files_dir)), desc='load reservation_segment_detail'):
+            df = pd.read_csv(reservation_segment_detail_files_dir[i], index_col=None, dtype={'iata_num':str, 'confirmation_num':str})
+            df['file_name'] = reservation_segment_detail_files_name[i]
+            df['modified_time'] = reservation_segment_detail_files_mod_time[i]
+            li.append(df)
+        add_reservation_segment_detail = pd.concat(li, axis=0, ignore_index=True)
+
+        # transform
+        add_reservation_segment_detail['depart_date'] = pd.to_datetime(add_reservation_segment_detail['depart_date'])
+        add_reservation_segment_detail['reservation_book_date'] = pd.to_datetime(add_reservation_segment_detail['reservation_book_date'])
+        add_reservation_segment_detail['reservation_seg_book_date'] = pd.to_datetime(add_reservation_segment_detail['reservation_seg_book_date'])
+        
+        # load to sqlite
+        apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_segment_detail'])
+        try: 
+            add_reservation_segment_detail.to_sql('reservation_segment_detail', conn, if_exists='append', index=False)
+            log_list.append(['reservation_segment_detail', 'new rows loaded', pd.Timestamp.now()])
+        except: log_list.append(['reservation_segment_detail', 'cannot load new rows', pd.Timestamp.now()])
+
+    else:
+        log_list.append(['reservation_segment_detail', 'no new rows added', pd.Timestamp.now()])
+        apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_segment_detail'])
+
 # ---------------------------------------------------------------------------------  
 # ---------------------------------------------------------------------------------  
 # ---------------------------------------------------------------------------------  
@@ -656,6 +689,7 @@ payment_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fac
 reservation = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation'
 pax_transaction = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pax_transaction'
 reservation_charge_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation_charge_detail'
+reservation_segment_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation_segment_detail'
 
 dim_agent = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_agent'
 dim_calendar = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\dim_calendar'
@@ -667,7 +701,7 @@ fee_type = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\fee_t
 exchange_rate = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\exchange_rate'
 
 
-dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation, pax_transaction, reservation_charge_detail,
+dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation, pax_transaction, reservation_charge_detail, reservation_segment_detail,
         dim_agent, dim_calendar, dim_routes, dim_fare_code, dim_slot_time, flight_type, fee_type, exchange_rate]
 frame_list = []
 
@@ -699,6 +733,7 @@ load_flown_aircraft_leg()
 load_reservation()
 load_pax_transaction()
 # load_reservation_charge_detail()
+load_reservation_segment_detail()
 
 load_dim_agent()
 load_dim_calendar()
