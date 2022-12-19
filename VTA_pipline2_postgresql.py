@@ -9,9 +9,21 @@ import datetime
 from datetime import timedelta
 pd.options.mode.chained_assignment = None
 
+
+from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
+url_object = URL.create(
+    "postgresql",
+    username="lotus",
+    password="lotus",
+    host="localhost",
+    port="5433",
+    database="lotusdb")
+engine = create_engine(url_object)
+
+
 # create connection to sqlite
-conn = sqlite3.connect(r"C:\Users\VTA-HAN\Desktop\VTA\VTA_RM.db")
-c = conn.cursor()
+
 warining_msg = '*****WARNING***** cannot add new rows to SQLite'
 BG = 160000
 
@@ -25,7 +37,7 @@ def delete_rows_SQL(table, file_mame):
             WHERE file_name = '{file_mame}'
         """
     c.execute(query)
-    conn.commit()
+    engine.commit()
 
 def delete_rows_cmd(row):
     delete_rows_SQL(row['table_name'], row['file_name'])
@@ -111,7 +123,7 @@ def load_payment_detail():
     #     delete and update new rows to SQLite
         apply_delete_row(remove_table[remove_table['table_name'] == 'payment_detail'])
         try: 
-            add_payment_detail.to_sql('payment_detail', conn, if_exists='append', index=False)
+            add_payment_detail.to_sql('payment_detail', engine, if_exists='append', index=False)
             log_list.append(['payment_detail', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['payment_detail', 'cannot load new rows', pd.Timestamp.now()])
     else:
@@ -143,7 +155,7 @@ def load_pax_revenue():
     #   delete and update new rows to SQLite
         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_revenue'])
         try: 
-            add_pax_revenue.to_sql('pax_revenue', conn, if_exists='append', index=False)
+            add_pax_revenue.to_sql('pax_revenue', engine, if_exists='append', index=False)
             log_list.append(['pax_revenue', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['pax_revenue', 'cannot load new rows', pd.Timestamp.now()])
     else:
@@ -170,7 +182,7 @@ def load_inflow_cash():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'inflow_cash'])
         try: 
-            add_inflow_cash.to_sql('inflow_cash', conn, if_exists='append', index=False)
+            add_inflow_cash.to_sql('inflow_cash', engine, if_exists='append', index=False)
             log_list.append(['inflow_cash', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['inflow_cash', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -202,7 +214,7 @@ def load_cargo():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'cargo'])
         try: 
-            add_cargo.to_sql('cargo', conn, if_exists='append', index=False)
+            add_cargo.to_sql('cargo', engine, if_exists='append', index=False)
             log_list.append(['cargo', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['cargo', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -236,7 +248,7 @@ def load_flown_aircraft_leg():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'flown_aircraft_leg'])
         try: 
-            add_flown_aircraft_leg.to_sql('flown_aircraft_leg', conn, if_exists='append', index=False)
+            add_flown_aircraft_leg.to_sql('flown_aircraft_leg', engine, if_exists='append', index=False)
             log_list.append(['flown_aircraft_leg', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['flown_aircraft_leg', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -273,7 +285,7 @@ def load_reservation():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation'])
         try: 
-            add_reservation.to_sql('reservation', conn, if_exists='append', index=False)
+            add_reservation.to_sql('reservation', engine, if_exists='append', index=False)
             log_list.append(['reservation', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['reservation', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -306,7 +318,7 @@ def load_pax_transaction():
         #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
         try: 
-            add_pax_transaction.to_sql('pax_transaction', conn, if_exists='append', index=False)
+            add_pax_transaction.to_sql('pax_transaction', engine, if_exists='append', index=False)
             log_list.append(['pax_transaction', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['pax_transaction', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -345,7 +357,7 @@ def load_reservation_charge_detail():
         # load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_charge_detail'])
         try: 
-            add_reservation_charge_detail.to_sql('reservation_charge_detail', conn, if_exists='append', index=False)
+            add_reservation_charge_detail.to_sql('reservation_charge_detail', engine, if_exists='append', index=False)
             log_list.append(['reservation_charge_detail', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['reservation_charge_detail', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -379,7 +391,7 @@ def load_reservation_segment_detail():
         # load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation_segment_detail'])
         try: 
-            add_reservation_segment_detail.to_sql('reservation_segment_detail', conn, if_exists='append', index=False)
+            add_reservation_segment_detail.to_sql('reservation_segment_detail', engine, if_exists='append', index=False)
             log_list.append(['reservation_segment_detail', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['reservation_segment_detail', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -411,7 +423,7 @@ def load_dim_agent():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_agent'])
         try: 
-            add_dim_agent.to_sql('dim_agent', conn, if_exists='replace', index=False)
+            add_dim_agent.to_sql('dim_agent', engine, if_exists='replace', index=False)
             log_list.append(['dim_agent', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_agent', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -439,7 +451,7 @@ def load_dim_calendar():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_calendar'])
         try: 
-            add_dim_calendar.to_sql('dim_calendar', conn, if_exists='replace', index=False)
+            add_dim_calendar.to_sql('dim_calendar', engine, if_exists='replace', index=False)
             log_list.append(['dim_calendar', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_calendar', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -467,7 +479,7 @@ def load_dim_fare_code():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_fare_code'])
         try: 
-            add_dim_fare_code.to_sql('dim_fare_code', conn, if_exists='replace', index=False)
+            add_dim_fare_code.to_sql('dim_fare_code', engine, if_exists='replace', index=False)
             log_list.append(['dim_fare_code', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_fare_code', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -495,7 +507,7 @@ def load_dim_routes():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_routes'])
         try: 
-            add_dim_routes.to_sql('dim_routes', conn, if_exists='replace', index=False)
+            add_dim_routes.to_sql('dim_routes', engine, if_exists='replace', index=False)
             log_list.append(['dim_routes', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_routes', 'cannot load new rows', pd.Timestamp.now()])
         
@@ -523,7 +535,7 @@ def load_dim_slot_time():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_slot_time'])
         try: 
-            add_dim_slot_time.to_sql('dim_slot_time', conn, if_exists='replace', index=False)
+            add_dim_slot_time.to_sql('dim_slot_time', engine, if_exists='replace', index=False)
             log_list.append(['dim_slot_time', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_slot_time', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -551,7 +563,7 @@ def load_flight_type():
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'flight_type'])
         try: 
-            add_flight_type.to_sql('flight_type', conn, if_exists='replace', index=False)
+            add_flight_type.to_sql('flight_type', engine, if_exists='replace', index=False)
             log_list.append(['flight_type', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['flight_type', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -579,7 +591,7 @@ def load_fee_type():
         #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'fee_type'])
         try: 
-            add_fee_type.to_sql('fee_type', conn, if_exists='replace', index=False)
+            add_fee_type.to_sql('fee_type', engine, if_exists='replace', index=False)
             log_list.append(['fee_type', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['fee_type', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -614,7 +626,7 @@ def load_exchange_rate():
 
         apply_delete_row(remove_table[remove_table['table_name'] == 'exchange_rate'])
         try: 
-            add_exchange_rate.to_sql('exchange_rate', conn, if_exists='replace', index=False)
+            add_exchange_rate.to_sql('exchange_rate', engine, if_exists='replace', index=False)
             log_list.append(['exchange_rate', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['exchange_rate', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -676,7 +688,7 @@ def load_target_cost():
     target_cost.sort_values(by=['Sector', 'Valid_date'], inplace=True)
 
     # # load to SQL
-    target_cost.to_sql('target_cost', conn, if_exists='replace', index=False)
+    target_cost.to_sql('target_cost', engine, if_exists='replace', index=False)
     log_list.append(['target_cost', 'new rows updated', pd.Timestamp.now()])
 
 
@@ -715,7 +727,7 @@ SELECT *
     FROM log_table
 """
 
-previous_log_table = pd.read_sql_query(query, conn)
+previous_log_table = pd.read_sql_query(query, engine)
 previous_log_table['modified_time'] = pd.to_datetime(previous_log_table['modified_time'])
 
 diff_table = pd.concat([previous_log_table, new_log_table]).drop_duplicates(ignore_index=True, keep=False)
@@ -747,7 +759,7 @@ load_exchange_rate()
 
 
 # write new log_table
-new_log_table.to_sql('log_table', conn, if_exists='replace', index=False)
+new_log_table.to_sql('log_table', engine, if_exists='replace', index=False)
 print('write new log_table: done')
 
 
@@ -840,8 +852,8 @@ market_pricing.drop_duplicates(inplace=True)
 market_pricing['type'] = 'normal'
 
 #     write to SQL
-market_pricing.to_sql('market_pricing', conn, if_exists='replace', index=False)
-total_market_price.to_sql('total_market_price', conn, if_exists='replace', index=False)
+market_pricing.to_sql('market_pricing', engine, if_exists='replace', index=False)
+total_market_price.to_sql('total_market_price', engine, if_exists='replace', index=False)
 log_list.append(['total_market_price', f'new rows updated - {total_market_price.shape}', pd.Timestamp.now()])
 # print(f'replicate pricing normal days {total_market_price.shape} : done')
 
@@ -932,8 +944,8 @@ market_pricing.drop_duplicates(inplace=True)
 market_pricing['type'] = 'normal'
 
 #     write to SQL
-market_pricing.to_sql('market_pricing', conn, if_exists='append', index=False)
-total_market_price.to_sql('total_market_price', conn, if_exists='append', index=False)
+market_pricing.to_sql('market_pricing', engine, if_exists='append', index=False)
+total_market_price.to_sql('total_market_price', engine, if_exists='append', index=False)
 log_list.append(['total_market_price', f'new rows updated - {total_market_price.shape}', pd.Timestamp.now()])
 
 
