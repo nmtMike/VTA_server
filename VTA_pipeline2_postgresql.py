@@ -1,5 +1,4 @@
 # import necessary materials
-import sqlite3
 import pandas as pd
 from pandas.tseries.offsets import MonthEnd
 import glob
@@ -7,21 +6,22 @@ import os
 from tqdm import tqdm
 import datetime
 from datetime import timedelta
+
 pd.options.mode.chained_assignment = None
 
-
+from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
 url_object = URL.create(
     "postgresql",
-    username="lotus",
-    password="lotus",
+    username="vta",
+    password="vta",
     host="localhost",
-    port="5433",
-    database="lotusdb")
+    port="5432",
+    database="vtadb")
 engine = create_engine(url_object)
 
-
+session = Session(engine)
 # create connection to sqlite
 
 warining_msg = '*****WARNING***** cannot add new rows to SQLite'
@@ -36,8 +36,8 @@ def delete_rows_SQL(table, file_mame):
         DELETE FROM {table}
             WHERE file_name = '{file_mame}'
         """
-    c.execute(query)
-    engine.commit()
+    session.execute(query)
+    session.commit()
 
 def delete_rows_cmd(row):
     delete_rows_SQL(row['table_name'], row['file_name'])
@@ -951,4 +951,4 @@ log_list.append(['total_market_price', f'new rows updated - {total_market_price.
 
 log_dir = 'C:\\Users\\VTA-HAN\\NMT\\OneDrive\\Viettravel Airline\\Database\\fact\\log_history'
 log_time = datetime.datetime.now().strftime('%Y%m%d.%H%M%S')
-pd.DataFrame(log_list, columns=['table_name', 'action', 'updated_time']).to_excel(f'{log_dir}\\log_file_{log_time}.xlsx', index=False)
+pd.DataFrame(log_list, columns=['table_name', 'action', 'updated_time']).to_excel(f'{log_dir}\\postgres_log_file_{log_time}.xlsx', index=False)
