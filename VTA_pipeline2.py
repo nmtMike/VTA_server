@@ -370,6 +370,11 @@ def load_reservation_segment_detail():
             df['modified_time'] = reservation_segment_detail_files_mod_time[i]
             li.append(df)
         add_reservation_segment_detail = pd.concat(li, axis=0, ignore_index=True)
+        add_reservation_segment_detail.columns = ['operating_flight_num', 'depart_date', 'from_airport', 'to_airport', 'flight_status', 
+            'reservation_book_date', 'reservation_seg_book_date', 'reservation_segement_cancel_date', 'confirmation_num', 'record_num', 
+            'last_name', 'first_name', 'cabin', 'booking_channel', 'fare_class_code', 'saved_fb_code', 'air_fare_amount', 'service_charge_amount', 
+            'tax_in_fare_amount', 'other_tax_amount', 'fuel_tax_amount', 'res_seg_status_descr', 'has_boarding_pass', 'is_revenue', 'ptc', 'crs_code', 
+            'travel_agent_booking', 'iata_num', 'convert_timezone', 'file_name', 'modified_time']
 
         # transform
         add_reservation_segment_detail['depart_date'] = pd.to_datetime(add_reservation_segment_detail['depart_date'])
@@ -732,7 +737,7 @@ load_cargo()
 load_flown_aircraft_leg()
 load_reservation()
 load_pax_transaction()
-# load_reservation_charge_detail()
+load_reservation_charge_detail()
 load_reservation_segment_detail()
 
 load_dim_agent()
