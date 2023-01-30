@@ -685,6 +685,14 @@ def load_target_cost():
     log_list.append(['target_cost', 'new rows updated', pd.Timestamp.now()])
 
 
+# ---------------------------------------------------------------------------------         
+  
+def last_refreshed():
+    df = pd.DataFrame({'refresh_datetime':[pd.Timestamp.now()]})
+    df.to_sql('refresh_datetime', conn, if_exists='replace', index=False)
+
+
+# ---------------------------------------------------------------------------------   
 # declare which dir to load
 cargo = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\cargo'
 flown_aircraft_leg = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\flown_aircraft_leg'
@@ -749,7 +757,7 @@ load_flight_type()
 load_target_cost()
 load_fee_type()
 load_exchange_rate()
-
+last_refreshed()
 
 # write new log_table
 new_log_table.to_sql('log_table', conn, if_exists='replace', index=False)
