@@ -84,8 +84,10 @@ def load_payment_detail():
         add_payment_detail = pd.concat(li, axis=0, ignore_index=True)
 
         #     drop the 'unamed 39' column if exists
+        try: add_payment_detail.drop(columns='Unnamed: 39', inplace=True)
+        except: pass
         if len(add_payment_detail.columns) == 42:
-            add_payment_detail.drop(add_payment_detail.columns[-3], axis=1, inplace=True)
+            add_payment_detail.drop(add_payment_detail.columns[-1], axis=1, inplace=True)
 
     #         rename columns
         add_payment_detail.columns = ['CONFIRMATION_NUM', 'BOOKING_TYPE', 'RES_STATUS',
@@ -688,7 +690,8 @@ def load_target_cost():
 # ---------------------------------------------------------------------------------         
   
 def last_refreshed():
-    df = pd.DataFrame({'refresh_datetime':[pd.Timestamp.now()]})
+    t = pd.Timestamp.now()
+    df = pd.DataFrame({'refresh_datetime':[t.replace(microsecond=0, nanosecond=0)]})
     df.to_sql('refresh_datetime', conn, if_exists='replace', index=False)
 
 

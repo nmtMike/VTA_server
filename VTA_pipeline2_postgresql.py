@@ -96,8 +96,10 @@ def load_payment_detail():
         add_payment_detail = pd.concat(li, axis=0, ignore_index=True)
 
         #     drop the 'unamed 39' column if exists
+        try: add_payment_detail.drop(columns='Unnamed: 39', inplace=True)
+        except: pass
         if len(add_payment_detail.columns) == 42:
-            add_payment_detail.drop(add_payment_detail.columns[-3], axis=1, inplace=True)
+            add_payment_detail.drop(add_payment_detail.columns[-1], axis=1, inplace=True)
 
     #         rename columns
         add_payment_detail.columns = ['CONFIRMATION_NUM', 'BOOKING_TYPE', 'RES_STATUS',
@@ -113,12 +115,27 @@ def load_payment_detail():
            'RPT_AMOUNT', 'file_name', 'modified_time']
         add_payment_detail['IATA_NUM'].fillna(add_payment_detail['USER_ID'], inplace=True)
         add_payment_detail['IATA_NUM'].fillna(add_payment_detail['BOOKING_AGENT'], inplace=True)
-        try:
-            tmp = add_payment_detail['RPT_AMOUNT'].copy()
-            add_payment_detail['RPT_AMOUNT'] = add_payment_detail['RPT_AMOUNT'].str.replace(',', '')
-            add_payment_detail['RPT_AMOUNT'].fillna(tmp, inplace=True)
-        except:
-            pass
+        
+        add_payment_detail['BOOK_DATE_GMT'] = pd.to_datetime(add_payment_detail['BOOK_DATE_GMT'])
+        add_payment_detail['BOOK_DATE_LCL'] = pd.to_datetime(add_payment_detail['BOOK_DATE_LCL'])
+        add_payment_detail['LAST_MODIFIED_GMT'] = pd.to_datetime(add_payment_detail['LAST_MODIFIED_GMT'])
+        add_payment_detail['LAST_MODIFIED_LCL'] = pd.to_datetime(add_payment_detail['LAST_MODIFIED_LCL'])
+        add_payment_detail['DATE_PAID_GMT'] = pd.to_datetime(add_payment_detail['DATE_PAID_GMT'])
+        add_payment_detail['DATE_PAID_LCL'] = pd.to_datetime(add_payment_detail['DATE_PAID_LCL'])
+        add_payment_detail['DATE_PAID_GMT'] = pd.to_datetime(add_payment_detail['DATE_PAID_GMT'])
+        add_payment_detail['DATE_PAID_GMT'] = pd.to_datetime(add_payment_detail['DATE_PAID_GMT'])
+
+
+        col_list = ['AMOUNT_PAID', 'BASE_AMOUNT', 'RPT_AMOUNT']
+        for l in col_list:
+            tmp = add_payment_detail[l].copy()
+            try: add_payment_detail[l] = add_payment_detail[l].str.replace(',', '')
+            except: pass
+            try: add_payment_detail[l].fillna(tmp, inplace=True)
+            except: pass
+            try: add_payment_detail[l] = add_payment_detail[l].astype('float')
+            except: pass
+
 
     #     delete and update new rows to SQLite
         apply_delete_row(remove_table[remove_table['table_name'] == 'payment_detail'])
@@ -132,35 +149,35 @@ def load_payment_detail():
 
 # ---------------------------------------------------------------------------------
 
-def load_pax_revenue():
-    pax_revenue_files_dir = add_table[add_table['table_name'] == 'pax_revenue'].reset_index(drop=True)['dir_file']
-    pax_revenue_files_mod_time = add_table[add_table['table_name'] == 'pax_revenue'].reset_index(drop=True)['modified_time']
-    pax_revenue_files_name = add_table[add_table['table_name'] == 'pax_revenue'].reset_index(drop=True)['file_name']
+# def load_pax_revenue():
+#     pax_revenue_files_dir = add_table[add_table['table_name'] == 'pax_revenue'].reset_index(drop=True)['dir_file']
+#     pax_revenue_files_mod_time = add_table[add_table['table_name'] == 'pax_revenue'].reset_index(drop=True)['modified_time']
+#     pax_revenue_files_name = add_table[add_table['table_name'] == 'pax_revenue'].reset_index(drop=True)['file_name']
 
-    if len(pax_revenue_files_dir) != 0:
-    #     read files into a dataframe
-        li = []
-        for i in tqdm(range(len(pax_revenue_files_dir)), desc='load pax_revenue'):
-            df = pd.read_excel(pax_revenue_files_dir[i], index_col=None, header=0)
-            df['file_name'] = pax_revenue_files_name[i]
-            df['modified_time'] = pax_revenue_files_mod_time[i]
-            # df.columns = ['CONFIRMATION_NUM', 'RES_SEG_STATUS_DESCRIPTION', 'BOOKING_AGENT', 'IATA_NUM', 'FARE_CLASS_CODE'
-            #              , 'SAVED_FB_CODE', 'PTC_DESCRIPTION', 'TITLE', 'LAST_NAME', 'FIRST_NAME', 'INFANT', 'FLIGHT_NUM'
-            #              , 'CARRIER_CODE', 'FROM_AIRPORT', 'TO_AIRPORT', 'DEPARTURE_DATE', 'DEPARTURE_TIME'
-            #              , 'FLIGHT_STATUS', 'BOOK_DATE', 'CNT_DATE', 'BF', 'PNLT', 'AX', 'C4', 'YR01', 'YR02'
-            #              , 'YQ', 'TOTAL_TAX', 'SERVICES_FEE', 'file_name', 'modified_time']
-            li.append(df)
-        add_pax_revenue = pd.concat(li, axis=0, ignore_index=True)
+#     if len(pax_revenue_files_dir) != 0:
+#     #     read files into a dataframe
+#         li = []
+#         for i in tqdm(range(len(pax_revenue_files_dir)), desc='load pax_revenue'):
+#             df = pd.read_excel(pax_revenue_files_dir[i], index_col=None, header=0)
+#             df['file_name'] = pax_revenue_files_name[i]
+#             df['modified_time'] = pax_revenue_files_mod_time[i]
+#             # df.columns = ['CONFIRMATION_NUM', 'RES_SEG_STATUS_DESCRIPTION', 'BOOKING_AGENT', 'IATA_NUM', 'FARE_CLASS_CODE'
+#             #              , 'SAVED_FB_CODE', 'PTC_DESCRIPTION', 'TITLE', 'LAST_NAME', 'FIRST_NAME', 'INFANT', 'FLIGHT_NUM'
+#             #              , 'CARRIER_CODE', 'FROM_AIRPORT', 'TO_AIRPORT', 'DEPARTURE_DATE', 'DEPARTURE_TIME'
+#             #              , 'FLIGHT_STATUS', 'BOOK_DATE', 'CNT_DATE', 'BF', 'PNLT', 'AX', 'C4', 'YR01', 'YR02'
+#             #              , 'YQ', 'TOTAL_TAX', 'SERVICES_FEE', 'file_name', 'modified_time']
+#             li.append(df)
+#         add_pax_revenue = pd.concat(li, axis=0, ignore_index=True)
 
-    #   delete and update new rows to SQLite
-        apply_delete_row(remove_table[remove_table['table_name'] == 'pax_revenue'])
-        try: 
-            add_pax_revenue.to_sql('pax_revenue', engine, if_exists='append', index=False)
-            log_list.append(['pax_revenue', 'new rows loaded', pd.Timestamp.now()])
-        except: log_list.append(['pax_revenue', 'cannot load new rows', pd.Timestamp.now()])
-    else:
-        log_list.append(['pax_revenue', 'no new rows added', pd.Timestamp.now()])
-        apply_delete_row(remove_table[remove_table['table_name'] == 'pax_revenue'])
+#     #   delete and update new rows to SQLite
+#         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_revenue'])
+#         try: 
+#             add_pax_revenue.to_sql('pax_revenue', engine, if_exists='append', index=False)
+#             log_list.append(['pax_revenue', 'new rows loaded', pd.Timestamp.now()])
+#         except: log_list.append(['pax_revenue', 'cannot load new rows', pd.Timestamp.now()])
+#     else:
+#         log_list.append(['pax_revenue', 'no new rows added', pd.Timestamp.now()])
+#         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_revenue'])
 
 # ---------------------------------------------------------------------------------
 
@@ -257,74 +274,74 @@ def load_flown_aircraft_leg():
         apply_delete_row(remove_table[remove_table['table_name'] == 'flown_aircraft_leg'])
 # ---------------------------------------------------------------------------------        
 
-def load_reservation():
-    reservation_files_dir = add_table[add_table['table_name'] == 'reservation'].reset_index(drop=True)['dir_file']
-    reservation_files_mod_time = add_table[add_table['table_name'] == 'reservation'].reset_index(drop=True)['modified_time']
-    reservation_files_name = add_table[add_table['table_name'] == 'reservation'].reset_index(drop=True)['file_name']
+# def load_reservation():
+#     reservation_files_dir = add_table[add_table['table_name'] == 'reservation'].reset_index(drop=True)['dir_file']
+#     reservation_files_mod_time = add_table[add_table['table_name'] == 'reservation'].reset_index(drop=True)['modified_time']
+#     reservation_files_name = add_table[add_table['table_name'] == 'reservation'].reset_index(drop=True)['file_name']
 
-    if len(reservation_files_dir) != 0:
-    #     read files into a dataframe
-        li = []
-        for i in tqdm(range(len(reservation_files_dir)), desc='load reservation'):
-            df = pd.read_excel(reservation_files_dir[i], index_col=None, header=0)
-            df['file_name'] = reservation_files_name[i]
-            df['modified_time'] = reservation_files_mod_time[i]
-            li.append(df)
-        add_reservation = pd.concat(li, axis=0, ignore_index=True)
+#     if len(reservation_files_dir) != 0:
+#     #     read files into a dataframe
+#         li = []
+#         for i in tqdm(range(len(reservation_files_dir)), desc='load reservation'):
+#             df = pd.read_excel(reservation_files_dir[i], index_col=None, header=0)
+#             df['file_name'] = reservation_files_name[i]
+#             df['modified_time'] = reservation_files_mod_time[i]
+#             li.append(df)
+#         add_reservation = pd.concat(li, axis=0, ignore_index=True)
 
-    #     transform
-        # add_reservation = add_reservation[~(add_reservation['Status'] == 'Canceled')]
-        add_reservation['Book Date'] = pd.to_datetime(add_reservation['Book Date'])
-        add_reservation['Departure Date'] = pd.to_datetime(add_reservation['Departure Date'])
-        add_reservation.columns = ['last_name', 'first_name', 'confirm', 'book_date', 'departure_date', 
-                              'flight_number', 'class_code', 'ori_station', 'des_station', 'status', 'iata',
-                              'copr_id', 'record_locator', 'eticket_num', 'file_name', 'modified_time']
-        add_reservation['ori_station'] = add_reservation['ori_station'].str.strip()
-        add_reservation['des_station'] = add_reservation['des_station'].str.strip()
+#     #     transform
+#         # add_reservation = add_reservation[~(add_reservation['Status'] == 'Canceled')]
+#         add_reservation['Book Date'] = pd.to_datetime(add_reservation['Book Date'])
+#         add_reservation['Departure Date'] = pd.to_datetime(add_reservation['Departure Date'])
+#         add_reservation.columns = ['last_name', 'first_name', 'confirm', 'book_date', 'departure_date', 
+#                               'flight_number', 'class_code', 'ori_station', 'des_station', 'status', 'iata',
+#                               'copr_id', 'record_locator', 'eticket_num', 'file_name', 'modified_time']
+#         add_reservation['ori_station'] = add_reservation['ori_station'].str.strip()
+#         add_reservation['des_station'] = add_reservation['des_station'].str.strip()
 
-    #     load to sqlite
-        apply_delete_row(remove_table[remove_table['table_name'] == 'reservation'])
-        try: 
-            add_reservation.to_sql('reservation', engine, if_exists='append', index=False)
-            log_list.append(['reservation', 'new rows loaded', pd.Timestamp.now()])
-        except: log_list.append(['reservation', 'cannot load new rows', pd.Timestamp.now()])
+#     #     load to sqlite
+#         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation'])
+#         try: 
+#             add_reservation.to_sql('reservation', engine, if_exists='append', index=False)
+#             log_list.append(['reservation', 'new rows loaded', pd.Timestamp.now()])
+#         except: log_list.append(['reservation', 'cannot load new rows', pd.Timestamp.now()])
 
-    else:
-        log_list.append(['reservation', 'no new rows added', pd.Timestamp.now()])
-        apply_delete_row(remove_table[remove_table['table_name'] == 'reservation'])
+#     else:
+#         log_list.append(['reservation', 'no new rows added', pd.Timestamp.now()])
+#         apply_delete_row(remove_table[remove_table['table_name'] == 'reservation'])
 
 # ---------------------------------------------------------------------------------  
-def load_pax_transaction():
-    pax_transaction_files_dir = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['dir_file']
-    pax_transaction_files_mod_time = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['modified_time']
-    pax_transaction_files_name = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['file_name']
+# def load_pax_transaction():
+#     pax_transaction_files_dir = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['dir_file']
+#     pax_transaction_files_mod_time = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['modified_time']
+#     pax_transaction_files_name = add_table[add_table['table_name'] == 'pax_transaction'].reset_index(drop=True)['file_name']
 
-    if len(pax_transaction_files_dir) != 0:
-    #     read files into a dataframe
-        li = []
-        for i in tqdm(range(len(pax_transaction_files_dir)), desc='load pax_transaction'):
-            df = pd.read_excel(pax_transaction_files_dir[i], index_col=None, header=0)
-            df['file_name'] = pax_transaction_files_name[i]
-            df['modified_time'] = pax_transaction_files_mod_time[i]
-            li.append(df)
-        add_pax_transaction = pd.concat(li, axis=0, ignore_index=True)
+#     if len(pax_transaction_files_dir) != 0:
+#     #     read files into a dataframe
+#         li = []
+#         for i in tqdm(range(len(pax_transaction_files_dir)), desc='load pax_transaction'):
+#             df = pd.read_excel(pax_transaction_files_dir[i], index_col=None, header=0)
+#             df['file_name'] = pax_transaction_files_name[i]
+#             df['modified_time'] = pax_transaction_files_mod_time[i]
+#             li.append(df)
+#         add_pax_transaction = pd.concat(li, axis=0, ignore_index=True)
 
-        #     transfrom
-        add_pax_transaction['DEPARTURE_DATE'] = pd.to_datetime(add_pax_transaction['DEPARTURE_DATE'])
-        add_pax_transaction['BOOK_DATE'] = pd.to_datetime(add_pax_transaction['BOOK_DATE'])
-        add_pax_transaction['IATA_NUM'] = add_pax_transaction['IATA_NUM'].fillna(add_pax_transaction['BOOKING_AGENT']).astype(str).str.replace('.0', '', regex=False)
-        # add_pax_transaction['IATA_NUM'].fillna(add_pax_transaction['BOOKING_AGENT'], inplace=True)
+#         #     transfrom
+#         add_pax_transaction['DEPARTURE_DATE'] = pd.to_datetime(add_pax_transaction['DEPARTURE_DATE'])
+#         add_pax_transaction['BOOK_DATE'] = pd.to_datetime(add_pax_transaction['BOOK_DATE'])
+#         add_pax_transaction['IATA_NUM'] = add_pax_transaction['IATA_NUM'].fillna(add_pax_transaction['BOOKING_AGENT']).astype(str).str.replace('.0', '', regex=False)
+#         # add_pax_transaction['IATA_NUM'].fillna(add_pax_transaction['BOOKING_AGENT'], inplace=True)
 
-        #     load to sqlite
-        apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
-        try: 
-            add_pax_transaction.to_sql('pax_transaction', engine, if_exists='append', index=False)
-            log_list.append(['pax_transaction', 'new rows loaded', pd.Timestamp.now()])
-        except: log_list.append(['pax_transaction', 'cannot load new rows', pd.Timestamp.now()])
+#         #     load to sqlite
+#         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
+#         try: 
+#             add_pax_transaction.to_sql('pax_transaction', engine, if_exists='append', index=False)
+#             log_list.append(['pax_transaction', 'new rows loaded', pd.Timestamp.now()])
+#         except: log_list.append(['pax_transaction', 'cannot load new rows', pd.Timestamp.now()])
 
-    else:
-        log_list.append(['pax_transaction', 'no new rows added', pd.Timestamp.now()])
-        apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
+#     else:
+#         log_list.append(['pax_transaction', 'no new rows added', pd.Timestamp.now()])
+#         apply_delete_row(remove_table[remove_table['table_name'] == 'pax_transaction'])
 
 
 # ---------------------------------------------------------------------------------  
@@ -696,15 +713,18 @@ def load_target_cost():
     target_cost.to_sql('target_cost', engine, if_exists='replace', index=False)
     log_list.append(['target_cost', 'new rows updated', pd.Timestamp.now()])
 
+# ---------------------------------------------------------------------------------   
+def last_refreshed():
+    t = pd.Timestamp.now()
+    df = pd.DataFrame({'refresh_datetime':[t.replace(microsecond=0, nanosecond=0)]})
+    df.to_sql('refresh_datetime', engine, if_exists='replace', index=False)
+
 
 # declare which dir to load
 cargo = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\cargo'
 flown_aircraft_leg = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\flown_aircraft_leg'
 inflow_cash = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\inflow_cash'
-pax_revenue = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pax_revenue'
 payment_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\payment_detail'
-reservation = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation'
-pax_transaction = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\pax_transaction'
 reservation_charge_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation_charge_detail'
 reservation_segment_detail = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\fact\reservation_segment_detail'
 
@@ -718,7 +738,7 @@ fee_type = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\fee_t
 exchange_rate = r'C:\Users\VTA-HAN\NMT\OneDrive\Viettravel Airline\Database\dim\exchange_rate'
 
 
-dir_list = [cargo, flown_aircraft_leg, inflow_cash, pax_revenue, payment_detail, reservation, pax_transaction, reservation_charge_detail, reservation_segment_detail,
+dir_list = [cargo, flown_aircraft_leg, inflow_cash, payment_detail, reservation_charge_detail, reservation_segment_detail,
         dim_agent, dim_calendar, dim_routes, dim_fare_code, dim_slot_time, flight_type, fee_type, exchange_rate]
 frame_list = []
 
@@ -743,14 +763,11 @@ add_table = pd.concat([new_log_table, keep_table]).drop_duplicates(ignore_index=
 
 # load new rows
 load_payment_detail()
-load_pax_revenue()
 load_inflow_cash()
 load_cargo()
 load_flown_aircraft_leg()
-load_reservation()
-load_pax_transaction()
 # load_reservation_charge_detail()
-load_reservation_segment_detail()
+# load_reservation_segment_detail()
 
 load_dim_agent()
 load_dim_calendar()
@@ -761,7 +778,7 @@ load_flight_type()
 load_target_cost()
 load_fee_type()
 load_exchange_rate()
-
+last_refreshed()
 
 # write new log_table
 new_log_table.to_sql('log_table', engine, if_exists='replace', index=False)
@@ -956,4 +973,4 @@ log_list.append(['total_market_price', f'new rows updated - {total_market_price.
 
 log_dir = 'C:\\Users\\VTA-HAN\\NMT\\OneDrive\\Viettravel Airline\\Database\\fact\\log_history'
 log_time = datetime.datetime.now().strftime('%Y%m%d.%H%M%S')
-pd.DataFrame(log_list, columns=['table_name', 'action', 'updated_time']).to_excel(f'{log_dir}\\postgres_log_file_{log_time}.xlsx', index=False)
+pd.DataFrame(log_list, columns=['table_name', 'action', 'updated_time']).to_excel(f'{log_dir}\\log_file_{log_time}.xlsx', index=False)
