@@ -115,6 +115,7 @@ def load_payment_detail():
            'RPT_AMOUNT', 'file_name', 'modified_time']
         add_payment_detail['IATA_NUM'].fillna(add_payment_detail['USER_ID'], inplace=True)
         add_payment_detail['IATA_NUM'].fillna(add_payment_detail['BOOKING_AGENT'], inplace=True)
+        add_payment_detail['IATA_NUM'] = add_payment_detail['IATA_NUM'].astype('str').str.replace('.0', '', regex=False)
         
         add_payment_detail['BOOK_DATE_GMT'] = pd.to_datetime(add_payment_detail['BOOK_DATE_GMT'])
         add_payment_detail['BOOK_DATE_LCL'] = pd.to_datetime(add_payment_detail['BOOK_DATE_LCL'])
@@ -228,6 +229,12 @@ def load_cargo():
                         'gross_wt', 'charge_wt', 'cbm', 'revenue_before_tax',
                         'revenue_after_tax', 'file_name', 'modified_time']
 
+        col_list = ['revenue_before_tax']
+        for l in col_list:
+            try: add_cargo[l] = add_cargo[l].astype('float')
+            except: pass
+
+        
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'cargo'])
         try: 
@@ -766,8 +773,8 @@ load_payment_detail()
 load_inflow_cash()
 load_cargo()
 load_flown_aircraft_leg()
-# load_reservation_charge_detail()
-# load_reservation_segment_detail()
+load_reservation_charge_detail()
+load_reservation_segment_detail()
 
 load_dim_agent()
 load_dim_calendar()
@@ -873,9 +880,19 @@ market_pricing = market_pricing[['VU_compare_unique_flight_code', 'name', 'bag',
 market_pricing.drop_duplicates(inplace=True)
 market_pricing['type'] = 'normal'
 
+
+# clear content in 'total_market_price' table
+delete_query = """
+DELETE FROM market_pricing;
+DELETE FROM total_market_price;
+"""
+session.execute(delete_query)
+session.commit()
+
+
 #     write to SQL
-market_pricing.to_sql('market_pricing', engine, if_exists='replace', index=False)
-total_market_price.to_sql('total_market_price', engine, if_exists='replace', index=False)
+market_pricing.to_sql('market_pricing', engine, if_exists='append', index=False)
+total_market_price.to_sql('total_market_price', engine, if_exists='append', index=False)
 log_list.append(['total_market_price', f'new rows updated - {total_market_price.shape}', pd.Timestamp.now()])
 # print(f'replicate pricing normal days {total_market_price.shape} : done')
 
@@ -964,6 +981,15 @@ market_pricing = market_pricing[['VU_compare_unique_flight_code', 'name', 'bag',
                                 'adjusted_price', 'departure_datetime', 'pricing_date', 'file_name', 'modified_time']]
 market_pricing.drop_duplicates(inplace=True)
 market_pricing['type'] = 'normal'
+
+
+# clear content in 'total_market_price' table
+delete_query = """
+DELETE FROM total_market_price;
+"""
+session.execute(delete_query)
+session.commit()
+
 
 #     write to SQL
 market_pricing.to_sql('market_pricing', engine, if_exists='append', index=False)

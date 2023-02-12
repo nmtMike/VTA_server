@@ -103,12 +103,26 @@ def load_payment_detail():
            'RPT_AMOUNT', 'file_name', 'modified_time']
         add_payment_detail['IATA_NUM'].fillna(add_payment_detail['USER_ID'], inplace=True)
         add_payment_detail['IATA_NUM'].fillna(add_payment_detail['BOOKING_AGENT'], inplace=True)
-        try:
-            tmp = add_payment_detail['RPT_AMOUNT'].copy()
-            add_payment_detail['RPT_AMOUNT'] = add_payment_detail['RPT_AMOUNT'].str.replace(',', '')
-            add_payment_detail['RPT_AMOUNT'].fillna(tmp, inplace=True)
-        except:
-            pass
+
+        add_payment_detail['BOOK_DATE_GMT'] = pd.to_datetime(add_payment_detail['BOOK_DATE_GMT'])
+        add_payment_detail['BOOK_DATE_LCL'] = pd.to_datetime(add_payment_detail['BOOK_DATE_LCL'])
+        add_payment_detail['LAST_MODIFIED_GMT'] = pd.to_datetime(add_payment_detail['LAST_MODIFIED_GMT'])
+        add_payment_detail['LAST_MODIFIED_LCL'] = pd.to_datetime(add_payment_detail['LAST_MODIFIED_LCL'])
+        add_payment_detail['DATE_PAID_GMT'] = pd.to_datetime(add_payment_detail['DATE_PAID_GMT'])
+        add_payment_detail['DATE_PAID_LCL'] = pd.to_datetime(add_payment_detail['DATE_PAID_LCL'])
+        add_payment_detail['DATE_PAID_GMT'] = pd.to_datetime(add_payment_detail['DATE_PAID_GMT'])
+        add_payment_detail['DATE_PAID_GMT'] = pd.to_datetime(add_payment_detail['DATE_PAID_GMT'])
+
+
+        col_list = ['AMOUNT_PAID', 'BASE_AMOUNT', 'RPT_AMOUNT']
+        for l in col_list:
+            tmp = add_payment_detail[l].copy()
+            try: add_payment_detail[l] = add_payment_detail[l].str.replace(',', '')
+            except: pass
+            try: add_payment_detail[l].fillna(tmp, inplace=True)
+            except: pass
+            try: add_payment_detail[l] = add_payment_detail[l].astype('float')
+            except: pass
 
     #     delete and update new rows to SQLite
         apply_delete_row(remove_table[remove_table['table_name'] == 'payment_detail'])
