@@ -449,10 +449,17 @@ def load_dim_agent():
         add_dim_agent = pd.concat(li, axis=0, ignore_index=True)
 
 
+        delete_query = """
+        DELETE FROM dim_agent;
+        """
+        session.execute(delete_query)
+        session.commit()
+
+
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_agent'])
         try: 
-            add_dim_agent.to_sql('dim_agent', engine, if_exists='replace', index=False)
+            add_dim_agent.to_sql('dim_agent', engine, if_exists='append', index=False)
             log_list.append(['dim_agent', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_agent', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -477,10 +484,17 @@ def load_dim_calendar():
         add_dim_calendar = pd.concat(li, axis=0, ignore_index=True)
 
 
+        delete_query = """
+        DELETE FROM dim_calendar;
+        """
+        session.execute(delete_query)
+        session.commit()
+
+
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_calendar'])
         try: 
-            add_dim_calendar.to_sql('dim_calendar', engine, if_exists='replace', index=False)
+            add_dim_calendar.to_sql('dim_calendar', engine, if_exists='append', index=False)
             log_list.append(['dim_calendar', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_calendar', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -505,10 +519,17 @@ def load_dim_fare_code():
         add_dim_fare_code = pd.concat(li, axis=0, ignore_index=True)
 
 
+        delete_query = """
+        DELETE FROM dim_fare_code;
+        """
+        session.execute(delete_query)
+        session.commit()
+
+
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_fare_code'])
         try: 
-            add_dim_fare_code.to_sql('dim_fare_code', engine, if_exists='replace', index=False)
+            add_dim_fare_code.to_sql('dim_fare_code', engine, if_exists='append', index=False)
             log_list.append(['dim_fare_code', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_fare_code', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -533,10 +554,17 @@ def load_dim_routes():
         add_dim_routes = pd.concat(li, axis=0, ignore_index=True)
 
 
+        delete_query = """
+        DELETE FROM dim_routes;
+        """
+        session.execute(delete_query)
+        session.commit()
+
+
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_routes'])
         try: 
-            add_dim_routes.to_sql('dim_routes', engine, if_exists='replace', index=False)
+            add_dim_routes.to_sql('dim_routes', engine, if_exists='append', index=False)
             log_list.append(['dim_routes', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_routes', 'cannot load new rows', pd.Timestamp.now()])
         
@@ -561,10 +589,16 @@ def load_dim_slot_time():
         add_dim_slot_time = pd.concat(li, axis=0, ignore_index=True)
 
 
+        delete_query = """
+        DELETE FROM dim_slot_time;
+        """
+        session.execute(delete_query)
+        session.commit()
+
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'dim_slot_time'])
         try: 
-            add_dim_slot_time.to_sql('dim_slot_time', engine, if_exists='replace', index=False)
+            add_dim_slot_time.to_sql('dim_slot_time', engine, if_exists='append', index=False)
             log_list.append(['dim_slot_time', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['dim_slot_time', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -589,10 +623,16 @@ def load_flight_type():
         add_flight_type = pd.concat(li, axis=0, ignore_index=True)
 
 
+        delete_query = """
+        DELETE FROM flight_type;
+        """
+        session.execute(delete_query)
+        session.commit()
+
     #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'flight_type'])
         try: 
-            add_flight_type.to_sql('flight_type', engine, if_exists='replace', index=False)
+            add_flight_type.to_sql('flight_type', engine, if_exists='append', index=False)
             log_list.append(['flight_type', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['flight_type', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -617,10 +657,16 @@ def load_fee_type():
             li.append(df)
         add_fee_type = pd.concat(li, axis=0, ignore_index=True)
 
+        delete_query = """
+        DELETE FROM fee_type;
+        """
+        session.execute(delete_query)
+        session.commit()
+
         #     load to sqlite
         apply_delete_row(remove_table[remove_table['table_name'] == 'fee_type'])
         try: 
-            add_fee_type.to_sql('fee_type', engine, if_exists='replace', index=False)
+            add_fee_type.to_sql('fee_type', engine, if_exists='append', index=False)
             log_list.append(['fee_type', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['fee_type', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -654,8 +700,15 @@ def load_exchange_rate():
         add_exchange_rate = add_exchange_rate_new.reindex(new_index).reset_index().sort_values(by=['Code', 'Valid_date']).fillna(method='ffill').reset_index(drop=True)
 
         apply_delete_row(remove_table[remove_table['table_name'] == 'exchange_rate'])
+
+        delete_query = """
+        DELETE FROM exchange_rate;
+        """
+        session.execute(delete_query)
+        session.commit()
+
         try: 
-            add_exchange_rate.to_sql('exchange_rate', engine, if_exists='replace', index=False)
+            add_exchange_rate.to_sql('exchange_rate', engine, if_exists='append', index=False)
             log_list.append(['exchange_rate', 'new rows loaded', pd.Timestamp.now()])
         except: log_list.append(['exchange_rate', 'cannot load new rows', pd.Timestamp.now()])
 
@@ -716,8 +769,14 @@ def load_target_cost():
     target_cost.reset_index(inplace=True)
     target_cost.sort_values(by=['Sector', 'Valid_date'], inplace=True)
 
+    delete_query = """
+    DELETE FROM target_cost;
+    """
+    session.execute(delete_query)
+    session.commit()
+
     # # load to SQL
-    target_cost.to_sql('target_cost', engine, if_exists='replace', index=False)
+    target_cost.to_sql('target_cost', engine, if_exists='append', index=False)
     log_list.append(['target_cost', 'new rows updated', pd.Timestamp.now()])
 
 # ---------------------------------------------------------------------------------   
